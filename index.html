@@ -59,7 +59,7 @@ ul.rev b{display:block}
   <div class="hero"><img alt="Josef mit blauer Kappe" src="assets/josef.jpg"><h2>Wie gut kennst du Mittelbadisch?</h2></div>
   <button class="btn primary" id="mA">Dialekt → Hochdeutsch<small id="bA" style="color:inherit;opacity:.85"></small></button>
   <button class="btn primary" id="mB">Hochdeutsch → Dialekt<small id="bB" style="color:inherit;opacity:.85"></small></button>
-  <p class="note">Je Runde gibt es 10 Fragen aus <span id="cnt"></span> Wörtern. Die Einträge stammen aus einem Buch-Scan und sind noch nicht alle auf Tippfehler geprüft.</p>
+  <p class="note">Je Runde gibt es 10 Fragen. Das Wörterbuch umfasst über tausend Dialekt-Wörter.</p>
 </section>
 
 <section id="play" hidden>
@@ -88,7 +88,7 @@ try{best=Object.assign(best,JSON.parse(localStorage.getItem('jj-best')||'{}'))}c
 const saveBest=()=>{try{localStorage.setItem('jj-best',JSON.stringify(best))}catch(e){}};
 let mode='a',qs=[],i=0,score=0,wrong=[],locked=false;
 const show=id=>{['home','play','end'].forEach(s=>$('#'+s).hidden=s!==id);window.scrollTo(0,0)};
-function home(){$('#cnt').textContent=D.length;if(D.length<4){$('#mA').disabled=$('#mB').disabled=true}$('#bA').textContent=best.a?'Bestes Ergebnis: '+best.a+' von '+N:'';$('#bB').textContent=best.b?'Bestes Ergebnis: '+best.b+' von '+N:'';show('home')}
+function home(){if(D.length<4){$('#mA').disabled=$('#mB').disabled=true}$('#bA').textContent=best.a?'Bestes Ergebnis: '+best.a+' von '+N:'';$('#bB').textContent=best.b?'Bestes Ergebnis: '+best.b+' von '+N:'';show('home')}
 function build(e,pool,idx){
   const ok=e[idx],L=ok.length;
   const c=pool.filter(x=>x[0].toLowerCase()!==e[0].toLowerCase()&&x[idx].toLowerCase()!==ok.toLowerCase())
