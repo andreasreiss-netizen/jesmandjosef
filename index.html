@@ -22,9 +22,12 @@ h1,h2,.big{font-family:"Baloo 2","Arial Rounded MT Bold",system-ui,sans-serif;li
 .top{display:flex;align-items:center;gap:12px;margin-bottom:18px}
 .top img{width:52px;height:52px;border-radius:14px;border:2px solid var(--ink);background:#fff}
 .top h1{font-size:28px;font-weight:800}
-.hero{display:grid;grid-template-columns:120px 1fr;gap:16px;align-items:end;background:var(--gold);color:#1B1F4B;border-radius:22px;padding:18px 18px 0;border:2px solid #1B1F4B;overflow:hidden}
+.hero{display:grid;grid-template-columns:auto 1fr;background:var(--gold);color:#1B1F4B;border-radius:22px;border:2px solid #1B1F4B;overflow:hidden}
+.hero .fig{display:flex;align-items:flex-end;padding:18px 16px 0 18px}
 .hero img{width:120px;display:block;border-radius:14px 14px 0 0;background:#fff}
-.hero h2{font-size:26px;font-weight:800;padding-bottom:18px}
+.hero .map{display:flex;align-items:flex-end;min-width:0;padding:12px;border-left:2px solid #1B1F4B;background:#fff url(assets/baden.jpg) 50% 40%/cover no-repeat}
+.hero h2{font-size:22px;font-weight:800;hyphens:auto;overflow-wrap:break-word;text-shadow:0 0 3px #fff,0 0 8px #fff,0 0 14px #fff}
+@media (min-width:480px){.hero h2{font-size:26px}}
 .card{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:18px;margin-top:16px}
 .btn{display:block;width:100%;text-align:left;font:inherit;font-weight:600;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:14px;padding:14px 16px;margin-top:10px;min-height:56px;cursor:pointer}
 .btn:hover{border-color:var(--blue)}
@@ -56,10 +59,10 @@ ul.rev b{display:block}
 <div class="top"><img alt="" src="assets/josef-icon.png"><h1>JesmandJosef</h1></div>
 
 <section id="home">
-  <div class="hero"><img alt="Josef mit blauer Kappe" src="assets/josef.jpg"><h2>Wie gut kennst du Mittelbadisch?</h2></div>
+  <div class="hero"><div class="fig"><img alt="Josef mit blauer Kappe" src="assets/josef.jpg"></div><div class="map"><h2>Wie gut kennst du Mittelbadisch?</h2></div></div>
   <button class="btn primary" id="mA">Dialekt → Hochdeutsch<small id="bA" style="color:inherit;opacity:.85"></small></button>
   <button class="btn primary" id="mB">Hochdeutsch → Dialekt<small id="bB" style="color:inherit;opacity:.85"></small></button>
-  <p class="note">Je Runde gibt es 10 Fragen. Das Wörterbuch umfasst über 1,300 Dialekt-Wörter.</p>
+  <p class="note">Das Quiz beinhaltet über 1.300 Dialektbegriffe aus dem Mittelbadischen.</p>
   <p class="note">Speichere Dir diese Seite als Link auf Deinem Homebildschirm (teilen), und Du hast eine kostenfreie App - ganz ohne Datenklau!</p>
   <p class="note"><strong>JesmandJosef wünscht Dir viel Spaß!</strong></p>
 </section>
