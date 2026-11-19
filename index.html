@@ -93,7 +93,10 @@ try{best=Object.assign(best,JSON.parse(localStorage.getItem('jj-best')||'{}'))}c
 const saveBest=()=>{try{localStorage.setItem('jj-best',JSON.stringify(best))}catch(e){}};
 let mode='a',qs=[],i=0,score=0,wrong=[],locked=false;
 const show=id=>{['home','play','end'].forEach(s=>$('#'+s).hidden=s!==id);window.scrollTo(0,0)};
-function home(){if(D.length<4){$('#mA').disabled=$('#mB').disabled=true}$('#bA').textContent=best.a?'Bestes Ergebnis: '+best.a+' von '+N:'';$('#bB').textContent=best.b?'Bestes Ergebnis: '+best.b+' von '+N:'';show('home')}
+function prog(m){const G=groupsFor(m),b=bags[m]||(bags[m]=loadBag(m)),sk=new Set(b.seen);return G.keys.filter(k=>sk.has(k)).length+' von '+G.keys.length+' Wörtern gesehen'}
+function home(){if(D.length<4){$('#mA').disabled=$('#mB').disabled=true}
+  const t=(m,x)=>(best[m]?'Bestes Ergebnis: '+best[m]+' von '+N+' · ':'')+prog(m);
+  $('#bA').textContent=t('a');$('#bB').textContent=t('b');show('home')}
 function build(e,pool,idx){
   const ok=e[idx],L=ok.length;
   const c=pool.filter(x=>x[0].toLowerCase()!==e[0].toLowerCase()&&x[idx].toLowerCase()!==ok.toLowerCase())
@@ -103,32 +106,50 @@ function build(e,pool,idx){
   return {e,ok,opts:shuffle([ok,...out])};
 }
 const hash=s=>{let h=5381;for(let k=0;k<s.length;k++)h=((h<<5)+h+s.charCodeAt(k))|0;return h};
-const SIG=D.length+':'+hash(D.map(x=>x[0]+'|'+x[1]).join('\n'));
-const decks={a:null,b:null};
+const bags={a:null,b:null};
 function groupsFor(m){
   const idx=m==='a'?0:1,pool=m==='a'?D:D.filter(x=>x[1].length<=60),map=new Map();
   pool.forEach(e=>{const k=e[idx].toLowerCase();if(!map.has(k))map.set(k,[]);map.get(k).push(e)});
-  return {pool,groups:[...map.values()]};
+  return {pool,groups:[...map.values()],keys:[...map.keys()].map(hash)};
 }
-function loadDeck(m,n){
-  try{const d=JSON.parse(localStorage.getItem('jj-deck-'+m)||'null');
-    if(d&&d.sig===SIG&&Array.isArray(d.rest)&&d.rest.every(x=>Number.isInteger(x)&&x>=0&&x<n))return d.rest}catch(e){}
-  return null;
+/* Mischbeutel pro Gerät: jedes Wort kommt erst wieder, wenn alle anderen einmal dran waren.
+   Gespeichert wird pro Wort (nicht pro Datenstand): neue Begriffe in D setzen den Fortschritt nicht zurück. */
+function loadBag(m){
+  try{const d=JSON.parse(localStorage.getItem('jj-bag-'+m)||'null');
+    if(d&&Array.isArray(d.seen)&&Array.isArray(d.recent))return d}catch(e){}
+  return {seen:[],recent:[]};
 }
-function saveDeck(m,rest){try{localStorage.setItem('jj-deck-'+m,JSON.stringify({sig:SIG,rest}))}catch(e){}}
-function draw(m,groups){
-  let rest=decks[m]||loadDeck(m,groups.length)||[];
-  if(rest.length<N){
-    const old=rest,have=new Set(old),fresh=shuffle(groups.map((_,k)=>k).filter(k=>!have.has(k)));
-    old.forEach(k=>fresh.splice(Math.floor(fresh.length/2+rnd(fresh.length/2+1)),0,k));
-    rest=old.concat(fresh);
+function saveBag(m,b){try{localStorage.setItem('jj-bag-'+m,JSON.stringify(b))}catch(e){}}
+function draw(m,G){
+  const {groups,keys}=G,ai=m==='a'?1:0,bag=bags[m]||(bags[m]=loadBag(m));
+  const take=[],takeK=[],used=new Set(),ans=new Set(),all=groups.map((_,k)=>k);
+  const grab=list=>{for(const k of list){
+    if(take.length>=N)break;if(used.has(k))continue;
+    const g=groups[k],e=g[rnd(g.length)],a=e[ai].toLowerCase();
+    if(ans.has(a))continue; /* gleiche Lösung nicht doppelt in einer Runde */
+    used.add(k);ans.add(a);take.push(e);takeK.push(keys[k]);
+  }};
+  let seen=new Set(bag.seen),hold=new Set(bag.hold||[]),wrapped=false;
+  /* 1) noch nicht gesehen und nicht zurückgestellt */
+  grab(shuffle(all.filter(k=>!seen.has(keys[k])&&!hold.has(keys[k]))));
+  /* 2) zurückgestellte Wörter (zuletzt gesehene des Vorgangs) kommen erst ganz am Ende */
+  if(take.length<N){grab(shuffle(all.filter(k=>!used.has(k)&&!seen.has(keys[k]))));hold=new Set()}
+  /* 3) Durchgang komplett: neu mischen, die letzten 80 gesehenen ans Ende des neuen Durchgangs */
+  if(take.length<N){
+    wrapped=true;seen=new Set(takeK);
+    hold=new Set(bag.recent.concat(takeK).slice(-80));
+    grab(shuffle(all.filter(k=>!used.has(k)&&!hold.has(keys[k]))));
+    grab(shuffle(all.filter(k=>!used.has(k))));
   }
-  const take=rest.splice(0,N);decks[m]=rest;saveDeck(m,rest);
-  return take.map(k=>{const g=groups[k];return g[rnd(g.length)]});
+  bag.seen=wrapped?takeK.slice():bag.seen.concat(takeK);
+  bag.hold=[...hold];
+  bag.recent=bag.recent.concat(takeK).slice(-80);
+  saveBag(m,bag);
+  return take;
 }
 function start(m){
-  mode=m;const idx=m==='a'?1:0,{pool,groups}=groupsFor(m);
-  qs=draw(m,groups).map(e=>build(e,pool,idx));
+  mode=m;const idx=m==='a'?1:0,G=groupsFor(m),pool=G.pool;
+  qs=draw(m,G).map(e=>build(e,pool,idx));
   i=0;score=0;wrong=[];show('play');ask();
 }
 function ask(){
