@@ -40,6 +40,7 @@ h1,h2,.big{font-family:"Baloo 2","Arial Rounded MT Bold",system-ui,sans-serif;li
 .meta{display:flex;justify-content:space-between;color:var(--soft);font-size:15px;margin:14px 0 8px}
 .q{font-size:34px;font-weight:800;text-align:center;padding:26px 8px;word-break:break-word}
 .q.long{font-size:24px}
+.q.xl{font-size:18px;font-weight:700}
 .btn.right{border-color:var(--ok);background:var(--okbg)}
 .btn.wrong{border-color:var(--red);background:var(--badbg)}
 .fb{min-height:28px;margin-top:14px;font-weight:600}
@@ -62,7 +63,7 @@ ul.rev b{display:block}
   <div class="hero"><div class="fig"><img alt="Josef mit blauer Kappe" src="assets/josef.jpg"></div><div class="map"><h2>Wie gut kennst du Mittelbadisch?</h2></div></div>
   <button class="btn primary" id="mA">Dialekt → Hochdeutsch<small id="bA" style="color:inherit;opacity:.85"></small></button>
   <button class="btn primary" id="mB">Hochdeutsch → Dialekt<small id="bB" style="color:inherit;opacity:.85"></small></button>
-  <p class="note">Das Quiz beinhaltet über 1.600 Dialektbegriffe aus dem Mittelbadischen.</p>
+  <p class="note">Das Quiz beinhaltet ca. 1.600 Dialektbegriffe aus dem Mittelbadischen.</p>
   <p class="note">Ein herzliches Dankeschön an die freiwilligen Helfer, die dabei mitgeholfen haben!</p>
   <p class="note">Speichere Dir diese Seite als Link auf Deinem Homebildschirm (teilen), und Du hast eine kostenfreie App - ganz ohne Datenklau!</p>
   <p class="note"><strong>JesmandJosef wünscht Dir viel Spaß!</strong></p>
@@ -93,7 +94,7 @@ try{best=Object.assign(best,JSON.parse(localStorage.getItem('jj-best')||'{}'))}c
 const saveBest=()=>{try{localStorage.setItem('jj-best',JSON.stringify(best))}catch(e){}};
 let mode='a',qs=[],i=0,score=0,wrong=[],locked=false;
 const show=id=>{['home','play','end'].forEach(s=>$('#'+s).hidden=s!==id);window.scrollTo(0,0)};
-function prog(m){const G=groupsFor(m),b=bags[m]||(bags[m]=loadBag(m)),sk=new Set(b.seen);return G.keys.filter(k=>sk.has(k)).length+' von '+G.keys.length+' Wörtern gesehen'}
+function prog(m){const G=groupsFor(m),b=bags[m]||(bags[m]=loadBag(m)),sk=new Set(b.seen);let n=0;G.groups.forEach((g,k)=>{if(sk.has(G.keys[k]))n+=g.length});return n+' von '+G.pool.length+' Einträgen gesehen'}
 function home(){if(D.length<4){$('#mA').disabled=$('#mB').disabled=true}
   const t=(m,x)=>(best[m]?'Bestes Ergebnis: '+best[m]+' von '+N+' · ':'')+prog(m);
   $('#bA').textContent=t('a');$('#bB').textContent=t('b');show('home')}
@@ -108,7 +109,7 @@ function build(e,pool,idx){
 const hash=s=>{let h=5381;for(let k=0;k<s.length;k++)h=((h<<5)+h+s.charCodeAt(k))|0;return h};
 const bags={a:null,b:null};
 function groupsFor(m){
-  const idx=m==='a'?0:1,pool=m==='a'?D:D.filter(x=>x[1].length<=60),map=new Map();
+  const idx=m==='a'?0:1,pool=D,map=new Map();
   pool.forEach(e=>{const k=e[idx].toLowerCase();if(!map.has(k))map.set(k,[]);map.get(k).push(e)});
   return {pool,groups:[...map.values()],keys:[...map.keys()].map(hash)};
 }
@@ -157,7 +158,7 @@ function ask(){
   $('#no').textContent='Frage '+(i+1)+' von '+N;$('#sc').textContent='Richtig: '+score;
   $('#pg').style.width=(i/N*100)+'%';
   const t=mode==='a'?q.e[0]:q.e[1];
-  const qt=$('#qt');qt.textContent=t;qt.classList.toggle('long',t.length>22);
+  const qt=$('#qt');qt.textContent=t;qt.classList.toggle('long',t.length>22&&t.length<=60);qt.classList.toggle('xl',t.length>60);
   $('#fb').textContent='';$('#fb').className='fb';$('#next').hidden=true;
   const box=$('#ans');box.textContent='';
   q.opts.forEach(o=>{const b=document.createElement('button');b.className='btn';b.textContent=o;b.onclick=()=>pick(b,o);box.appendChild(b)});
