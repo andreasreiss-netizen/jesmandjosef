@@ -26,7 +26,12 @@ h1,h2,.big{font-family:"Baloo 2","Arial Rounded MT Bold",system-ui,sans-serif;li
 .hero .fig{display:flex;align-items:flex-end;padding:18px 16px 0 18px}
 .hero img{width:120px;display:block;border-radius:14px 14px 0 0;background:#fff}
 .hero .map{display:flex;align-items:flex-end;min-width:0;padding:12px;border-left:2px solid #1B1F4B;background:#fff url(assets/baden.jpg) 50% 40%/cover no-repeat}
-.hero .map{container-type:inline-size}
+.hero .map{container-type:inline-size;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:8px}
+.snd{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:14px;font-weight:700;color:#1B1F4B;background:#F6D845;border:2px solid #1B1F4B;border-radius:99px;padding:5px 12px 5px 9px;cursor:pointer;min-height:34px}
+.snd:focus-visible{outline:3px solid #2B3A9E;outline-offset:2px}
+.snd[aria-pressed="true"]{background:#1B1F4B;color:#F6D845}
+.snd .ico-stop{display:none}.snd[aria-pressed="true"] .ico-play{display:none}.snd[aria-pressed="true"] .ico-stop{display:inline}
+@container (max-width:120px){.snd{font-size:13px;padding:4px 9px 4px 7px;gap:4px}}
 .hero h2{font-size:22px;font-size:min(22px,13cqi);font-weight:800;hyphens:none;width:100%;text-shadow:0 0 3px #fff,0 0 8px #fff,0 0 14px #fff}
 @media (min-width:480px){.hero h2{font-size:26px;font-size:min(26px,13cqi)}}
 .hero h2 .nw,.hero h2 .nw2{white-space:nowrap}
@@ -63,7 +68,7 @@ ul.rev b{display:block}
 <div class="top"><img alt="" src="assets/josef-icon.png"><h1>JesmandJosef</h1></div>
 
 <section id="home">
-  <div class="hero"><div class="fig"><img alt="Josef mit blauer Kappe" src="assets/josef.jpg"></div><div class="map"><h2><span class="hi">Hallo! Ich bin <span class="nw2">Jesmand-Josef.</span></span>Wie gut kennst Du unseren Dialekt der Region <span class="nw">Mittelbaden?</span></h2></div></div>
+  <div class="hero"><div class="fig"><img alt="Josef mit blauer Kappe" src="assets/josef.jpg"></div><div class="map"><button class="snd" id="snd" type="button" aria-pressed="false" hidden><span class="ico-play"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M3 9v6h4l5 4V5L7 9H3z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><svg class="ico-stop" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg><span id="sndT">Anhören</span></button><h2><span class="hi">Hallo! Ich bin <span class="nw2">Jesmand-Josef.</span></span>Wie gut kennst Du unseren Dialekt der Region <span class="nw">Mittelbaden?</span></h2></div></div>
   <button class="btn primary" id="mA">Dialekt → Hochdeutsch<small id="bA" style="color:inherit;opacity:.85"></small></button>
   <button class="btn primary" id="mB">Hochdeutsch → Dialekt<small id="bB" style="color:inherit;opacity:.85"></small></button>
   <p class="note">Das Quiz beinhaltet über 1.600 Dialektbegriffe aus dem Mittelbadischen.</p>
@@ -191,6 +196,16 @@ function finish(){
 $('#mA').onclick=()=>start('a');$('#mB').onclick=()=>start('b');
 $('#again').onclick=()=>start(mode);$('#back').onclick=home;
 home();
+/* Begrüßung zum Anhören: Antippen startet, nochmal Antippen stoppt */
+(()=>{const b=$('#snd'),t=$('#sndT');let a=null;
+  const set=on=>{b.setAttribute('aria-pressed',on);t.textContent=on?'Stopp':'Anhören'};
+  const stop=()=>{if(a){a.pause();a.currentTime=0}set(false)};
+  if(typeof Audio==='undefined')return;b.hidden=false;
+  b.onclick=()=>{if(!a){a=new Audio('assets/begruessung.mp3');a.onended=()=>set(false);a.onerror=()=>{set(false);b.hidden=true}}
+    if(a.paused){set(true);a.play().catch(()=>set(false))}else stop()};
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});
+  ['#mA','#mB'].forEach(s=>$(s).addEventListener('click',stop));
+})();
 /* Überschrift: zwei Zeilen, nie getrennt – Schrift nur verkleinern, falls eine Zeile nicht passt */
 function fitHero(){const h=$('.hero h2'),m=$('.hero .map');if(!h||!m)return;h.style.fontSize='';const cs=getComputedStyle(m),w=m.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);let f=parseFloat(getComputedStyle(h).fontSize);const widest=()=>Math.max(...[...h.querySelectorAll('.nw')].map(s=>s.getBoundingClientRect().width));while(widest()>w&&f>10){f-=0.5;h.style.fontSize=f+'px'}}
 fitHero();addEventListener('resize',fitHero);if(document.fonts)document.fonts.ready.then(fitHero);
