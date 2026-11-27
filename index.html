@@ -26,7 +26,8 @@ h1,h2,.big{font-family:"Baloo 2","Arial Rounded MT Bold",system-ui,sans-serif;li
 .hero .fig{display:flex;align-items:flex-end;padding:18px 16px 0 18px}
 .hero img{width:120px;display:block;border-radius:14px 14px 0 0;background:#fff}
 .hero .map{display:flex;align-items:flex-end;min-width:0;padding:12px;border-left:2px solid #1B1F4B;background:#fff url(assets/baden.jpg) 50% 40%/cover no-repeat}
-.hero .map{min-height:140px}
+.hero .map{min-height:140px;align-items:center;justify-content:center;padding:8px;background:#fff}
+.hero .map img.logo{width:100%;max-width:190px;height:auto;border-radius:0;background:none}
 .greet{grid-column:1/-1;border-top:2px solid #1B1F4B;padding:14px 18px 18px}
 .greet p{margin:12px 0 4px;font-weight:700;font-size:18px}
 .greet h2{font-size:23px;font-weight:800;hyphens:none;-webkit-hyphens:none;overflow-wrap:normal;word-break:keep-all}
@@ -66,7 +67,7 @@ ul.rev b{display:block}
 <div class="top"><img alt="" src="assets/josef-icon.png"><h1>JesmandJosef</h1></div>
 
 <section id="home">
-  <div class="hero"><div class="fig"><img alt="Josef mit blauer Kappe" src="assets/josef.jpg"></div><div class="map"></div>
+  <div class="hero"><div class="fig"><img alt="Josef mit blauer Kappe" src="assets/josef.jpg"></div><div class="map"><img class="logo" alt="badischquiz.de Logo" src="assets/badischquiz-512.png"></div>
     <div class="greet">
       <button class="listen" id="hear" type="button"><span aria-hidden="true">🔊</span><span id="hearT">Anhören</span></button>
       <p>Hallo. Ich bin Jesmand-Josef.</p>
